@@ -3,7 +3,7 @@ import numpy as np
 import itertools
 
 
-class OCP: # Quadratic OCP with random Q, c
+class OCP:  # Quadratic OCP with random Q, c
     newid = itertools.count().__next__
 
     def __init__(self, nx=1):
@@ -65,7 +65,7 @@ class Coupling:
 
     def add_coupling(self, new_constraint):
         self.coupling_constraints.append(new_constraint)
-        self.ng = len(self.coupling_constraints)
+        self.ng += 1
 
 
 if __name__ == '__main__':
@@ -79,12 +79,11 @@ if __name__ == '__main__':
         ocps.append(ocp)
 
     coupling = Coupling(ocps)
-    # Couple x_0_1 == x_1_0
     x_0_1 = coupling.ocp_by_id(0).x[1]
     x_1_0 = coupling.ocp_by_id(1).x[0]
     x_2_1 = coupling.ocp_by_id(2).x[1]
     coupling.add_coupling(x_0_1 - x_1_0)
-    coupling.add_coupling(x_2_1 - x_1_0)
+    coupling.add_coupling(x_2_1 - 2*x_1_0)
 
     coupling.build_central_problem()
     coupling.solve_central_problem()
