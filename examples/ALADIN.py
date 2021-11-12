@@ -12,9 +12,9 @@ b = 0
 x = DM([0, 0])  # Initial guess
 lam = 1         # Initial guess
 rho = 1         # Sufficiently large
-mu = 100          # Sufficiently large
+mu = 1        # Sufficiently large
 # Scaling matrix
-Sigma = 10*DM([[1, 0], [0, 1]])
+Sigma = DM([[1, 0], [0, 1]])
 epsilon = 1e-6
 err = 1
 k = 0
@@ -46,7 +46,7 @@ while err >= epsilon:
     # Gradient of f at y_opt
     g = Function('g', [y], [gradient(f, y)])
     g = g(y_opt)
-    # And Hessian
+    # And Hessian at y_opt
     H = jacobian(gradient(f, y), y)  # No ineq. constraints
     H = Function('H', [y], [H])
     H = H(y_opt)  # Take care of pos. defness!
@@ -64,7 +64,7 @@ while err >= epsilon:
     dy = v[0:2]
     lamqp = rqp['lam_g']
 
-    x = x + a1*(y_opt-x) + a2*dy  # == y_opt
+    x = x + a1*(y_opt-x) + a2*dy  # == y_opt + dy
     lam = lam + a3*(lamqp - lam)  # == lamqp
 
 print(f'x_opt: {x_opt}')
