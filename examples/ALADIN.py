@@ -49,8 +49,7 @@ while err >= epsilon:
     # And Hessian
     H = jacobian(gradient(f, y), y)  # No ineq. constraints
     H = Function('H', [y], [H])
-    # H = H(y_opt)
-    H = rho*A.T@A + n * np.eye(n, n)
+    H = H(y_opt)  # Take care of pos. defness!
 
     # Coupled QP with mu >0
     dy = SX.sym('dy', n)
@@ -62,9 +61,10 @@ while err >= epsilon:
     Sqp = qpsol('S', 'qpoases', qp)
     rqp = Sqp(ubg=0, lbg=0)  # Eq. constraint
     v = rqp['x']
+    dy = v[0:2]
     lamqp = rqp['lam_g']
 
-    x = x + a1*(y_opt-x)  # == y_opt
+    x = x + a1*(y_opt-x) + a2*dy  # == y_opt
     lam = lam + a3*(lamqp - lam)  # == lamqp
 
 print(f'x_opt: {x_opt}')
