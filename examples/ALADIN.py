@@ -9,12 +9,12 @@ m = 1
 A = SX(np.array([1, -1])).T
 b = 0
 
-x = DM([0, 0])  # Initial guess
-lam = 1         # Initial guess
-rho = 1         # Sufficiently large
-mu = 1        # Sufficiently large
+x = x_opt = DM([0, 0])  # Initial guess
+lam = 1                 # Initial guess
+rho = 1                 # Sufficiently large
+mu = 1                  # Sufficiently large
 # Scaling matrix
-Sigma = DM([[1, 0], [0, 1]])
+Sigma = DM.eye(2)
 epsilon = 1e-6
 err = 1
 k = 0
@@ -47,7 +47,7 @@ while err >= epsilon:
     g = Function('g', [y], [gradient(f, y)])
     g = g(y_opt)
     # And Hessian at y_opt
-    H = jacobian(gradient(f, y), y)  # No ineq. constraints
+    H = hessian(f, y)[0]  # No ineq. constraints
     H = Function('H', [y], [H])
     H = H(y_opt)  # Take care of pos. defness!
 
@@ -60,8 +60,7 @@ while err >= epsilon:
           'g': A@(y_opt+dy)-b-s}  # == 0, dual lamQP
     Sqp = qpsol('S', 'qpoases', qp)
     rqp = Sqp(ubg=0, lbg=0)  # Eq. constraint
-    v = rqp['x']
-    dy = v[0:2]
+    dy = rqp['x'][0:2]
     lamqp = rqp['lam_g']
 
     x = x + a1*(y_opt-x) + a2*dy  # == y_opt + dy
